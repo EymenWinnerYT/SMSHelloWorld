@@ -78,9 +78,9 @@ PrintString:
     SLA E                ;Multiply E by 2
     CALL PrintStringSetCrsr
 PrintStringStart:
-    LD A, (HL)
+    LD A, (HL)            ;Load character from string
     CP 255                ;Check end of string
-    JR Z, PrintStringDone
+    JR Z, PrintStringDone ;We're done if end
     LD A, C               ;Load low byte of cursor position
     OUT ($BF), A
     LD A, B               ;High byte
@@ -95,9 +95,10 @@ PrintStringStart:
     JR PrintStringStart
 
 PrintStringSetCrsr:
-    ;Calculate cursor position
+    ;Calculate cursor position (Y * 32)
     LD B, $00
     LD C, E
+    ;Shift left by 5 bits (effectively multiply by 32)
     SLA C
     RL B
     SLA C
@@ -116,7 +117,7 @@ PrintStringSetCrsr:
     LD E, D
     LD D, $00
     ADD HL, DE
-    LD DE, $7800
+    LD DE, $7800        ;(Y * 32 + X) + $7800 (address ORed with $40, normally it is $3800)
     ADD HL, DE
     LD BC, HL
     POP DE
@@ -129,12 +130,6 @@ WaitForVBlank:
     IN A, ($BF)
     BIT 7, A
     JR Z, WaitForVBlank
-    RET
-
-WaitForVBlankEnd:
-    IN A, ($BF)
-    BIT 7, A
-    JR NZ, WaitForVBlankEnd
     RET
 
 Msg:
@@ -177,17 +172,17 @@ ColorPalette:
     DB $00
 
 VDPData:
-    DB $24, $80
-    DB $40, $81
+    DB $24, $80        ;VDP reg #0: Enable mode 4, hide leftmost 8 pixels
+    DB $40, $81        ;VDP reg #1: Enable display
     DB $FF, $82
     DB $FF, $83
     DB $FF, $84
     DB $FF, $85
     DB $FF, $86
     DB $FF, $87
-    DB $00, $88
-    DB $00, $89
-    DB $FF, $8A
+    DB $00, $88        ;H scroll
+    DB $00, $89        ;V scroll
+    DB $FF, $8A        ;Overscan color
 
 TilePattern:
     incbin "TileMap.bin"
