@@ -1,4 +1,4 @@
-SCRVALH EQU $C000
+
     
     ORG $0000
     DI
