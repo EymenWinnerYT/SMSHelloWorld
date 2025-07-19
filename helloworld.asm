@@ -74,21 +74,22 @@ LoadTilesLoop:
     HALT
 
 PrintString:
-    SLA D
-    SLA E
+    SLA D                ;Multiply D by 2 (required for tilemap structure)
+    SLA E                ;Multiply E by 2
     CALL PrintStringSetCrsr
 PrintStringStart:
     LD A, (HL)
-    CP 255
+    CP 255                ;Check end of string
     JR Z, PrintStringDone
-    LD A, C
+    LD A, C               ;Load low byte of cursor position
     OUT ($BF), A
-    LD A, B
+    LD A, B               ;High byte
     OUT ($BF), A
     LD A, (HL)
     SUB 31
     OUT ($BE), A
     INC HL
+    ;Increment BC 2 times, because in master system every tile is 2 bytes
     INC BC
     INC BC
     JR PrintStringStart
