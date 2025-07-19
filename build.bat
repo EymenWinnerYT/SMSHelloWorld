@@ -1,3 +1,4 @@
+rem here, replace exact file name path and assembler path
 @echo off
 del helloworld.lst
 del helloworld.rom
